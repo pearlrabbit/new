@@ -1,3 +1,4 @@
+#include "Exam.h"
 #include "arrow_input.h"
 #include <iostream>
 #include <stdlib.h> // system 명령어 사용
@@ -23,10 +24,12 @@ void check_position(int &ypos, string direction, string str1, string str2,
                     string str3);
 void test_question();
 
+void sample_exam(string header, Exam exam);
+
 int main() {
-    string str1 = "테스트를 위한 문장입니다";
-    string str2 = "튜토리얼 문제로 이동하게 만들 문장입니다";
-    string str3 = "Enter를 누르면 종료하게 만들 문장입니다";
+    string str1 = "1. echo 명령어 사용";
+    string str2 = "2. cat 명령어 사용";
+    string str3 = "프로그램 종료";
 
     screen_Output();
     test_Print(str1, str2, str3);
@@ -101,11 +104,21 @@ void test_Print(string str1, string str2, string str3) {
     string_Color(str2, "47;30m");
     system("tput cup 4 1");
     string_Color(str3, "47;30m");
+    /*system("tput cup 5 1");
+    cout << "This is test for cout";*/
 
     system("tput rc");
 } // 인터페이스에 글씨 출력 테스트 함수(임시)
 
 void cursor(string str1, string str2, string str3) {
+    Exam exam1(EXAM_PRACTICE,
+               "echo 명령어를 이용하여 hello world 를 출력하시오 ",
+               "echo (문구) 을(를)이용하세요", "echo", "echo hello world");
+
+    Exam exam2(EXAM_PRACTICE,
+               "cat 명령어를 이용하여 sampleText 파일을 출력하시오 ",
+               "cat (파일이름) 을(를)이용하세요", "cat", "cat sampleText");
+
     system("tput sc");
     system("tput cup 2 1");
     string_Color(str1, "40;37m");
@@ -134,18 +147,8 @@ void cursor(string str1, string str2, string str3) {
             }
         } else if (ypos == 2) {
             if (ch == '\n') {
-                system("tput sc");
-                system("tput cup 25 1");
-                string_Color("테스트 문장을 클릭하셨습니다!", "40;37m");
-                system("tput rc");
-                count++;
-                if (count > 3) {
-                    system("tput sc");
-                    system("tput cup 25 1");
-                    string_Color("...더 눌러도 아무일도 일어나지 않는다구요",
-                                 "40;37m");
-                    system("tput rc");
-                }
+                string exam1_header = "1. echo 명령어 사용";
+                sample_exam(exam1_header, exam1);
             }
         } else if (ypos == 3) {
             if (ch == '\n') {
@@ -199,7 +202,8 @@ void test_question() {
     while (1) {
         screen_Output();
         system("tput cup 2 1");
-        string_Color("현재 디렉토리 안에 있는 파일을 간단한 형태로 보여주세요", "47;30m");
+        string_Color("현재 디렉토리 안에 있는 파일을 간단한 형태로 보여주세요",
+                     "47;30m");
         system("tput cup 3 1");
         string_Color("미구현 상태라 enter 누르면 종료합니다", "47;30m");
         /*system("read word");
@@ -226,8 +230,74 @@ void test_question() {
     }
 }
 
+void sample_exam(string header, Exam exam) {
+    int error = 0;
+    string input;
+    const char *c = input.c_str();
+    while (1) {
+        screen_Output();
+        if (error) {
+            system("tput cup 10 1");
+            system("echo \"\033[47;30m\"");
+            system(c);
+            system("tput cup 25 1");
+            cout << "\033[47;30m틀렸습니다!! 다시 입력해주세요.\033[0m\n"
+                 << endl;
+        }
+        system("tput cup 2 1");
+        cout << "\033[47;30m" + header + "\033[0m" << endl;
+        system("tput cup 3 1");
+        cout << "\033[47;30m" + exam.getDes() + "\033[0m" << endl;
+        system("tput cup 4 1");
+        cout << "\033[47;30m------------힌트------------\033[0m" << endl;
+        system("tput cup 5 1");
+        cout << "\033[47;30m" + exam.getHint() + "\033[0m" << endl;
+        system("tput cup 6 1");
+        cout << "\033[47;30m----------실행 예시----------\033[0m" << endl;
+        system("tput cup 7 1");
+        cout << "\033[47;30m" + exam.getAnswer() + "\033[0m" << endl;
+        // hello world만 떠야 할텐데 왜 그렇게 안되는거지...?
+        // system(exam.getAnswer().c_str()) 명령어에서 왜 echo가
+        // 삭제되는거지...?
+
+        system("tput cup 9 1");
+        cout << "\033[47;30m명령어 입력 : \033[0m";
+        // 색 마침을 안넣어주면 인터페이스 전체 색깔이 변해버리는 오류가 발생함
+        cout << "\033[47;30m";
+        getline(cin, input);
+        cout << "\033[0m" << endl; // 여기서 endl 안해주면 인터페이스 에러남
+        c = input.c_str();
+        if (input == exam.getAnswer()) {
+            system("tput cup 10 1");
+            system("echo \"\033[47;30m\"");
+            system(c); // *** 여기서 색 달아줘야 함 ***
+            // system("echo \"\033[0m\"");
+            // ...왜 색깔 지정을 안해줬는데 알아서 되는;;
+            // c에 색 명령어가 같이 저장되었을 것으로 판단됨
+            system("tput cup 11 1");
+            cout << "\033[47;30m맞았습니다!!\033[0m\n" << endl;
+            system("tput cup 12 1");
+            cout << "\033[47;30m아래 방향키를 누르면 메인화면으로 "
+                    "돌아갑니다.\033[0m\n"
+                 << endl;
+            break;
+        } else {
+            error = 1;
+            continue;
+        }
+    }
+
+    // cout에 endl을 쓰지 않을 경우 tput이 제대로 동작되지 않는다!!!
+    // cout << "\033[47;30m \033[0m\n"
+}
+
 // c++에서 echo -e(개행문자 사용)는 인식되지 않으며 자동 적용되어있는 상태이다
 // \"를 써야 따옴표가 인식된다
 
 // 1. 인터페이스에 표시되는 문자열을 따로 관리
 // 2. index값에 해당하는 문자열의 색깔을 바꿔서 출력
+
+// g++ interface.cpp Exam.cpp -o interface로 빌드
+
+// dat 파일 생성, pvp 구현(서버에서 문제 셋팅, 클라언트에게 뿌림, 먼저 맞춘 사람
+// 점수 부여)
