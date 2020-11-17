@@ -1,0 +1,169 @@
+#include <algorithm>
+#include <bits/stdc++.h>
+#include <cctype>
+#include <fcntl.h>
+#include <iostream>
+#include <stack>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <vector>
+using namespace std;
+
+class commands
+{
+public:
+    void pwd_cmd(vector<string> inp_cm);
+    void ls_cmd(vector<string> &vect_cmd, vector<string> &vect_path);
+    void cp_cmd(vector<string> &vect_cmd, vector<string> &vect_path, vector<string> &vect_name);
+    void mv_cmd();
+    void rm_cmd();
+    void check();
+    commands(vector<string> &vect_cmd, vector<string> &vect_path, vector<string> &vect_name);
+
+private:
+    vector<string> vect_cmd;
+    vector<string> vect_path;
+    vector<string> vect_name;
+    vector<string> pwd{"pwd"};
+    vector<string> ls{"ls", "-a", "-l", "-F", "-r", "-t", "-S"};
+    vector<string> cp{"cp", "-a", "-b", "-f", "-i", "-r", "-u"};
+    vector<string> mv{"mv", "-b", "-f", "-i", "-v", "-u"};
+    vector<string> rm{"rm", "-d", "-i", "-f", "-r", "-v"};
+};
+
+commands::commands(vector<string> &vect_cmd, vector<string> &vect_path, vector<string> &vect_name)
+{
+    this->vect_cmd = vect_cmd;
+    this->vect_path = vect_path;
+    this->vect_name = vect_name;
+}
+
+void commands::check()
+{
+    if (vect_cmd.front() == pwd.front())
+    {
+        pwd_cmd(vect_cmd);
+    }
+    else if (vect_cmd.front() == ls.front())
+    {
+        ls_cmd(vect_cmd, vect_path);
+    }
+}
+
+void commands::pwd_cmd(vector<string> inp_cmd)
+{
+    if (pwd == inp_cmd)
+    {
+        cout << "Right\n";
+    }
+    else
+        cout << "Command '" << inp_cmd.front() << "'"
+             << "not found, did you mean: " << pwd.front() << "\n";
+}
+
+void commands::ls_cmd(vector<string> &vect_cmd, vector<string> &vect_path)
+{
+    vector<string> cmd_line;
+    for (int i = 0; i < vect_cmd.size(); i++)
+    {
+        for (int j = 0; j < ls.size(); j++)
+        {
+            if (ls[j] == vect_cmd[i])
+            {
+                cmd_line.push_back(vect_cmd[i]);
+                vect_cmd.erase(vect_cmd.begin() + i);
+                i--;
+                break;
+            }
+        }
+    }
+
+    if (vect_cmd.size() == 0)
+    {
+        cout << "Right!\n";
+        for (int i = 0; i < cmd_line.size(); i++)
+        {
+            cout << cmd_line[i] << " ";
+        }
+
+        if (vect_path.size() != 0)
+        {
+            for (int j = 0; j < vect_path.size(); j++)
+            {
+                cout << vect_path[j];
+            }
+        }
+        cout << "\n";
+    }
+
+    else if (vect_cmd.size() != 0)
+    {
+        cout << cmd_line.front() << ": invalid option ";
+        for (int i = 0; i < vect_cmd.size(); i++)
+        {
+            cout << "'" << vect_cmd[i] << "'";
+        }
+        cout << "\n";
+    }
+}
+void commands::cp_cmd(vector<string> &vect_cmd, vector<string> &vect_path, vector<string> &vect_name) //Not finished
+{
+}
+void commands::mv_cmd() //not finished
+{
+}
+void commands::rm_cmd() //not finished
+{
+}
+// Split a sentence into words and put them into arrays
+void command_build(string inp_cmd, vector<string> &vect_cmd, vector<string> &vect_name, vector<string> &vect_path)
+{
+    string srch;
+    string wrd;
+    istringstream split_snt(inp_cmd);
+    while (split_snt >> wrd)
+    {
+        if (wrd.at(0) == '.' || wrd.at(0) == '/')
+        {
+            vect_path.push_back(wrd); //Stores pathes
+        }
+        else
+            vect_cmd.push_back(wrd); //Stores commands and options
+    }
+
+    for (int i = 0; i < vect_cmd.size(); i++)
+    {
+        if (vect_cmd[i] == vect_cmd.front() || (vect_cmd[i].at(0) == '-'))
+        {
+            continue;
+        }
+        else
+        {
+            srch = vect_cmd[i];
+            vect_name.push_back(srch); //Stores directories and files names
+            vector<string>::iterator result = find(vect_cmd.begin(), vect_cmd.end(), srch);
+            vect_cmd.erase(result);
+        }
+        i--;
+    }
+}
+
+int main()
+{
+    string inp_cmd;           // This variable is used to storage a command
+    vector<string> vect_cmd;  // In this array the program stres command and its option
+    vector<string> vect_name; // This array stores files and directories names
+    vector<string> vect_path; // Stores a path
+    cout << "!! NOW PWD and LS commands are available!!! Enter the command: " << endl;
+    getline(cin, inp_cmd);                                  //Input the user's command
+    command_build(inp_cmd, vect_cmd, vect_name, vect_path); //Send all arrays and the sentence to the method which are separates sentense into parts.
+    commands call(vect_cmd, vect_path, vect_name);          //When all is done this class checks the inputed sentence.
+    call.check();
+
+    return 0;
+}
