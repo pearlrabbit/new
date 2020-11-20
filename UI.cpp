@@ -12,10 +12,12 @@ const int HEIGHT = 27; // 세로 길이
 const string COLOR_HEADER = "46;30m";
 const string COLOR_MAIN_STRING = "47;30m";
 const string COLOR_EMPHASIS_STRING = "40;37m";
+// 색상 코드
 
 const string LIST1 = "1. echo 명령어 이용";
 const string LIST2 = "2. cat 명령어 이용";
 const string LIST_END = "3. 프로그램 종료";
+// 메인 화면 출력 문구 및 문제 헤더 출력 부분
 
 void screen_Output();
 void Header();
@@ -29,7 +31,19 @@ void indicate_Exams_Types();
 void check_Command();
 void indicate_Exams(string header, Exam exam);
 
-// 문제가 추가될 시,
+// 문제(exam)가 추가될 시 전역변수 추가,
+// indicate_Exams_Types() 함수 출력 구문 추가,
+// check_Command() switch문 추가, 수정 할 것!
+
+// <개선 필요 사항>
+// 1. 실행 예시 출력 부분(현재 정답이 출력되고 있음)
+// 2. Exam 선언(Exam이 많아질수록 코드가 지나치게 방대해짐)
+
+// <추가 예정 사항>
+// dat 파일 생성
+// pvp 구현(서버에서 문제 셋팅, 클라언트에게 뿌림, 먼저 맞춘 사람 점수 부여)
+
+// g++ UI.cpp Exam.cpp -o UI로 빌드할 것
 
 int main() {
     screen_Output();
@@ -151,7 +165,7 @@ void check_Command() {
         case 2:
             cin.ignore(4, '\n');
             system("tput rc");
-            indicate_Exams(LIST2, exam1);
+            indicate_Exams(LIST2, exam2);
             screen_Output();
             indicate_Exams_Types();
             continue;
@@ -229,9 +243,6 @@ void indicate_Exams(string header, Exam exam) {
             }
         } else {
             error = 1;
-            /*system("tput cup 15 5");
-            print_String("test last", COLOR_MAIN_STRING);
-            fflush(stdout);*/
             system("tput rc");
             continue;
         }
@@ -240,11 +251,4 @@ void indicate_Exams(string header, Exam exam) {
 
 // c++에서 echo -e(개행문자 사용)는 인식되지 않으며 자동 적용되어있는 상태이다
 // \"를 써야 따옴표가 인식된다
-
-// 1. 인터페이스에 표시되는 문자열을 따로 관리
-// 2. index값에 해당하는 문자열의 색깔을 바꿔서 출력
-
-// g++ UI.cpp Exam.cpp -o UI로 빌드
-
-// dat 파일 생성, pvp 구현(서버에서 문제 셋팅, 클라언트에게 뿌림, 먼저 맞춘 사람
-// 점수 부여)
+// -n(끝에서 개행하지 않음)은 자동 적용되어있지 않다
