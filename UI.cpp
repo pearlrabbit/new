@@ -202,6 +202,7 @@ void indicate_Exams(string header, Exam exam) {
             print_String("틀렸습니다!! 다시 입력해주세요.",
                          COLOR_EMPHASIS_STRING, "T");
         }
+
         system("tput cup 2 1");
         print_String(header, COLOR_MAIN_STRING, "T");
         system("tput cup 3 1");
@@ -213,10 +214,8 @@ void indicate_Exams(string header, Exam exam) {
         system("tput cup 6 1");
         print_String("----------실행 예시----------", COLOR_MAIN_STRING, "T");
         system("tput cup 7 1");
-        print_String(exam.getAnswer(), COLOR_MAIN_STRING, "T");
-        // hello world만 떠야 할텐데 왜 그렇게 안되는거지...?
-        // system(exam.getAnswer().c_str()) 명령어에서 왜 echo가
-        // 삭제되는거지...?
+        system("echo -n \"\033[47;30m\"");
+        system(exam.getAnswer().c_str());
 
         system("tput cup 9 1");
         print_String("명령어 입력 : ", COLOR_MAIN_STRING);
@@ -226,6 +225,10 @@ void indicate_Exams(string header, Exam exam) {
 
         c = input.c_str();
         if (input == exam.getAnswer()) {
+            system("tput cup 11 0");
+            for (int i = 11; i < HEIGHT - 1; i++)
+                blank_Frame(WIDTH - 2);
+            // 오답일 때 출력하는 공간 전체를 빈칸으로 초기화
             system("tput cup 11 1");
             system("echo -n \"\033[47;30m\"");
             system(c);
