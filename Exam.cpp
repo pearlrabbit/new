@@ -1,59 +1,57 @@
-#include "Exam.h"
+#include "Exam.hpp"
+#include <string.h>
+#include <iostream>
+using namespace std;
 
 Exam::Exam()
 {
-    this->answer = "";
-    this->command = "";
-    this->description = "";
+    this->num = -1;
+    memset(this->answer, 0x00, MAX_NAME_LEN + 1);
+    memset(this->description, 0x00, MAX_NAME_LEN + 1);
+    memset(this->hint, 0x00, MAX_NAME_LEN + 1);
 }
 
-Exam::Exam(ExamType type, string description, string hint, string command, string answer)
+Exam::Exam(int num, string description, string hint,string answer)
 {
-    this->type = type;
-    this->description = description;
-    this->command = command;
-    this->hint = hint;
-    this->answer = answer;
+    this->num = num;
+    memcpy(this->description, description.c_str(), MAX_NAME_LEN);
+    memcpy(this->hint, hint.c_str(), MAX_NAME_LEN);
+    memcpy(this->answer, answer.c_str(), MAX_NAME_LEN);
 }
 
-void Exam::setType(ExamType type)
+void Exam::setNum(int num)
 {
-    this->type = type;
+    this->num = num;
 }
 void Exam::setDes(string des)
 {
-    this->description = des;
+    memcpy(this->description, des.c_str(), MAX_NAME_LEN);
 }
 void Exam::setHint(string hint)
 {
-    this->hint = hint;
-}
-void Exam::setCommand(string command)
-{
-    this->command = command;
+    memcpy(this->hint, hint.c_str(), MAX_NAME_LEN);
 }
 void Exam::setAnswer(string answer)
 {
-    this->answer = answer;
+    memcpy(this->answer, answer.c_str(), MAX_NAME_LEN);
+}
+void Exam::printExam(void){
+    cout << "num : " << this->num << ",description : " << this->description
+    << ",answer : " << this->answer << endl;
 }
 
-ExamType Exam::getType()
-{
-    return type;
+int Exam::getNum(){
+    return num;
 }
 string Exam::getDes()
 {
-    return description;
+    return std::string(this->description);
 }
 string Exam::getHint()
 {
-    return hint;
-}
-string Exam::getCommand()
-{
-    return command;
+    return std::string(this->hint);
 }
 string Exam::getAnswer()
 {
-    return answer;
+    return std::string(this->answer);
 }
